@@ -23,7 +23,7 @@ import org.terasology.world.generation.WorldBuilder;
 import org.terasology.world.generator.RegisterWorldGenerator;
 import org.terasology.world.generator.plugin.WorldGeneratorPluginLibrary;
 
-@RegisterWorldGenerator(id="terraingen", displayName = "TerrainGen")
+@RegisterWorldGenerator(id="realisticmountains", displayName = "Realistic Mountains")
 public class TerrainGenerator extends BaseFacetedWorldGenerator{
     @In
     private WorldGeneratorPluginLibrary worldGeneratorPluginLibrary;

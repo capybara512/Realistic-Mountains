@@ -1,9 +1,9 @@
 {
-    "id" : "TerrainGen",
+    "id" : "realisticmountains",
     "version" : "0.1.0-SNAPSHOT",
     "author" : "David Johnson",
     "displayName" : "TerrainGen",
-    "description" : "Provides a basic terrain generator based on 2D value noise",
+    "description" : "Provides a basic terrain generator based on 2D multi-octave simplex noise",
     "dependencies" : [
         {
             "id": "Core",
