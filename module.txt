@@ -1,0 +1,14 @@
+{
+    "id" : "TerrainGen",
+    "version" : "0.1.0-SNAPSHOT",
+    "author" : "David Johnson",
+    "displayName" : "TerrainGen",
+    "description" : "Provides a basic terrain generator based on 2D value noise",
+    "dependencies" : [
+        {
+            "id": "Core",
+            "minVersion": "1.3.1"
+        }
+    ],
+    "serverSideOnly" : false
+}
