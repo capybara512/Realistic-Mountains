@@ -37,6 +37,7 @@ public class TerrainGenerator extends BaseFacetedWorldGenerator{
         return new WorldBuilder(worldGeneratorPluginLibrary)
                 .addProvider(new SurfaceProvider())
                 .addProvider(new SeaLevelProvider(0))
+                .addProvider(new MountainSurfaceModifier())
                 .addRasterizer(new TerrainRasterizer());
     }
 

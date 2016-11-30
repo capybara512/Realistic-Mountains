@@ -16,42 +16,42 @@
 package org.terasology.terraingen;
 
 import org.terasology.math.geom.BaseVector2i;
-import org.terasology.math.geom.Rect2i;
 import org.terasology.math.geom.Vector2f;
-import org.terasology.terraingen.noiseset.NoiseSet;
 import org.terasology.utilities.procedural.Noise;
 import org.terasology.utilities.procedural.SimplexNoise;
 import org.terasology.utilities.procedural.SubSampledNoise;
-import org.terasology.world.generation.Border3D;
+import org.terasology.world.generation.Facet;
 import org.terasology.world.generation.FacetProvider;
 import org.terasology.world.generation.GeneratingRegion;
-import org.terasology.world.generation.Produces;
+import org.terasology.world.generation.Updates;
 import org.terasology.world.generation.facets.SurfaceHeightFacet;
 
-@Produces(SurfaceHeightFacet.class)
-public class SurfaceProvider implements FacetProvider{
-    private static final int WORLD_HEIGHT_RANGE = 16;
-    private static final int WORLD_HEIGHT_BASE = 64;
+@Updates(@Facet(SurfaceHeightFacet.class))
+public class MountainSurfaceModifier implements FacetProvider{
+    private static final int MOUNTAIN_HEIGHT = 256;
     private Noise heightMap;
 
     @Override
     public void setSeed(long seed){
         heightMap = new SubSampledNoise(new SimplexNoise(seed), new Vector2f(0.01f, 0.01f), 1);
+
     }
 
     @Override
     public void process(GeneratingRegion region){
-        Border3D border = region.getBorderForFacet(SurfaceHeightFacet.class);
-        SurfaceHeightFacet surfaceHeightFacet = new SurfaceHeightFacet(region.getRegion(), border);
+        SurfaceHeightFacet surfaceHeightFacet = region.getRegionFacet(SurfaceHeightFacet.class);
 
-        Rect2i processRegion = surfaceHeightFacet.getWorldRegion();
-        for(BaseVector2i position : processRegion.contents()){
-            surfaceHeightFacet.setWorld(position,
-                    Math.round(heightMap.noise(position.x(), position.y())*WORLD_HEIGHT_RANGE + WORLD_HEIGHT_BASE) //rounding to allow == height grass to work in TerrainRasterizer
-            );
+        float noise;
+
+        for(BaseVector2i position : surfaceHeightFacet.getWorldRegion().contents()){
+            noise = heightMap.noise(position.x(), position.y());
+
+            if(noise > 0){
+                noise *= MOUNTAIN_HEIGHT;
+            }
+
+            surfaceHeightFacet.setWorld(position, Math.round(surfaceHeightFacet.getWorld(position) + noise));
         }
-
-        region.setRegionFacet(SurfaceHeightFacet.class, surfaceHeightFacet);
     }
 
 }
