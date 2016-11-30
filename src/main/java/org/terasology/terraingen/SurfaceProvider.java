@@ -17,11 +17,8 @@ package org.terasology.terraingen;
 
 import org.terasology.math.geom.BaseVector2i;
 import org.terasology.math.geom.Rect2i;
-import org.terasology.math.geom.Vector2f;
 import org.terasology.terraingen.noiseset.NoiseSet;
-import org.terasology.utilities.procedural.Noise;
-import org.terasology.utilities.procedural.SimplexNoise;
-import org.terasology.utilities.procedural.SubSampledNoise;
+import org.terasology.utilities.random.FastRandom;
 import org.terasology.world.generation.Border3D;
 import org.terasology.world.generation.FacetProvider;
 import org.terasology.world.generation.GeneratingRegion;
@@ -30,13 +27,21 @@ import org.terasology.world.generation.facets.SurfaceHeightFacet;
 
 @Produces(SurfaceHeightFacet.class)
 public class SurfaceProvider implements FacetProvider{
-    private static final int WORLD_HEIGHT_RANGE = 16;
-    private static final int WORLD_HEIGHT_BASE = 64;
-    private Noise heightMap;
+    private NoiseSet heightMap;
 
     @Override
     public void setSeed(long seed){
-        heightMap = new SubSampledNoise(new SimplexNoise(seed), new Vector2f(0.01f, 0.01f), 1);
+        FastRandom random = new FastRandom(seed); //using a random for each octave's seed to ensure that they are completely different -- provides slightly better results at a negligible performance impact of a new FastRandom object
+
+        heightMap = new NoiseSet(
+                NoiseSet.createSimplexOctaveBackend(random.nextLong(), 0.0008f, 128f),
+                NoiseSet.createSimplexOctaveBackend(random.nextLong(), 0.0016f, 64f),
+                NoiseSet.createSimplexOctaveBackend(random.nextLong(), 0.0032f, 32f),
+                NoiseSet.createSimplexOctaveBackend(random.nextLong(), 0.0128f, 16f),
+                NoiseSet.createSimplexOctaveBackend(random.nextLong(), 0.0256f, 8f),
+                NoiseSet.createSimplexOctaveBackend(random.nextLong(), 0.0512f, 4f),
+                NoiseSet.createSimplexOctaveBackend(random.nextLong(), 0.1024f, 2f)
+        );
     }
 
     @Override
@@ -47,7 +52,7 @@ public class SurfaceProvider implements FacetProvider{
         Rect2i processRegion = surfaceHeightFacet.getWorldRegion();
         for(BaseVector2i position : processRegion.contents()){
             surfaceHeightFacet.setWorld(position,
-                    Math.round(heightMap.noise(position.x(), position.y())*WORLD_HEIGHT_RANGE + WORLD_HEIGHT_BASE) //rounding to allow == height grass to work in TerrainRasterizer
+                    Math.round(heightMap.noise(position.x(), position.y())) //rounding to allow == height grass to work in TerrainRasterizer
             );
         }
 
