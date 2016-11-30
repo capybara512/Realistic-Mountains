@@ -17,6 +17,10 @@ package org.terasology.terraingen;
 
 import org.terasology.math.geom.BaseVector2i;
 import org.terasology.math.geom.Rect2i;
+import org.terasology.math.geom.Vector2f;
+import org.terasology.utilities.procedural.Noise;
+import org.terasology.utilities.procedural.SimplexNoise;
+import org.terasology.utilities.procedural.SubSampledNoise;
 import org.terasology.world.generation.Border3D;
 import org.terasology.world.generation.FacetProvider;
 import org.terasology.world.generation.GeneratingRegion;
@@ -25,10 +29,13 @@ import org.terasology.world.generation.facets.SurfaceHeightFacet;
 
 @Produces(SurfaceHeightFacet.class)
 public class SurfaceProvider implements FacetProvider{
+    private static final int WORLD_HEIGHT_RANGE = 16;
+    private static final int WORLD_HEIGHT_BASE = 64;
+    private Noise heightMap;
 
     @Override
     public void setSeed(long seed){
-
+        heightMap = new SubSampledNoise(new SimplexNoise(seed), new Vector2f(0.01f, 0.01f), 1);
     }
 
     @Override
@@ -38,7 +45,9 @@ public class SurfaceProvider implements FacetProvider{
 
         Rect2i processRegion = surfaceHeightFacet.getWorldRegion();
         for(BaseVector2i position : processRegion.contents()){
-            surfaceHeightFacet.setWorld(position, 64f);
+            surfaceHeightFacet.setWorld(position,
+                    Math.round(heightMap.noise(position.x(), position.y())*WORLD_HEIGHT_RANGE + WORLD_HEIGHT_BASE) //rounding to allow == height grass to work in TerrainRasterizer
+            );
         }
 
         region.setRegionFacet(SurfaceHeightFacet.class, surfaceHeightFacet);
