@@ -23,6 +23,7 @@ import org.terasology.world.generation.WorldBuilder;
 import org.terasology.world.generator.RegisterWorldGenerator;
 import org.terasology.world.generator.plugin.WorldGeneratorPluginLibrary;
 
+@SuppressWarnings("unused")
 @RegisterWorldGenerator(id="realisticmountains", displayName = "Realistic Mountains")
 public class TerrainGenerator extends BaseFacetedWorldGenerator{
     @In
@@ -37,7 +38,6 @@ public class TerrainGenerator extends BaseFacetedWorldGenerator{
         return new WorldBuilder(worldGeneratorPluginLibrary)
                 .addProvider(new SurfaceProvider())
                 .addProvider(new SeaLevelProvider(0))
-                //.addProvider(new MountainSurfaceModifier())
                 .addRasterizer(new TerrainRasterizer());
     }
 
