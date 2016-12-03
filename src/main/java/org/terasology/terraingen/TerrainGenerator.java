@@ -18,6 +18,8 @@ package org.terasology.terraingen;
 import org.terasology.core.world.generator.facetProviders.SeaLevelProvider;
 import org.terasology.engine.SimpleUri;
 import org.terasology.registry.In;
+import org.terasology.terraingen.trees.TreeProvider;
+import org.terasology.terraingen.trees.TreeRasterizer;
 import org.terasology.world.generation.BaseFacetedWorldGenerator;
 import org.terasology.world.generation.WorldBuilder;
 import org.terasology.world.generator.RegisterWorldGenerator;
@@ -38,7 +40,10 @@ public class TerrainGenerator extends BaseFacetedWorldGenerator{
         return new WorldBuilder(worldGeneratorPluginLibrary)
                 .addProvider(new SurfaceProvider())
                 .addProvider(new SeaLevelProvider(0))
-                .addRasterizer(new TerrainRasterizer());
+                .addProvider(new TreeProvider())
+                .addRasterizer(new TerrainRasterizer())
+                .addRasterizer(new TreeRasterizer())
+            ;
     }
 
 }

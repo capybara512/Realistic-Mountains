@@ -18,6 +18,8 @@ package org.terasology.terraingen;
 import org.terasology.math.ChunkMath;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.registry.CoreRegistry;
+import org.terasology.rendering.nui.widgets.treeView.Tree;
+import org.terasology.terraingen.trees.TreeFacet;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.CoreChunk;
@@ -26,7 +28,7 @@ import org.terasology.world.generation.WorldRasterizer;
 import org.terasology.world.generation.facets.SurfaceHeightFacet;
 
 public class TerrainRasterizer implements WorldRasterizer{
-    private Block dirt, grass;
+    private Block dirt, grass, trunk, leaf;
 
     @Override
     public void initialize(){
@@ -39,12 +41,14 @@ public class TerrainRasterizer implements WorldRasterizer{
         SurfaceHeightFacet surfaceHeightFacet = chunkRegion.getFacet(SurfaceHeightFacet.class);
 
         for(Vector3i location : chunkRegion.getRegion()){
-            float height = surfaceHeightFacet.getWorld(location.x, location.z);
+            int height = Math.round(surfaceHeightFacet.getWorld(location.x, location.z));
 
-            if(location.y < height){
-                chunk.setBlock(ChunkMath.calcBlockPos(location), dirt);
-            }else if(location.y == height){
-                chunk.setBlock(ChunkMath.calcBlockPos(location), grass);
+            if(chunk.getBlock(ChunkMath.calcBlockPos(location)).getURI().equals(BlockManager.AIR_ID)){
+                if(location.y < height){
+                    chunk.setBlock(ChunkMath.calcBlockPos(location), dirt);
+                }else if(location.y == height){
+                    chunk.setBlock(ChunkMath.calcBlockPos(location), grass);
+                }
             }
         }
     }
