@@ -26,6 +26,7 @@ import org.terasology.utilities.procedural.SubSampledNoise;
  */
 public class NoiseSet implements Noise{
     private NoiseBackend[] backends;
+    private float multiplier;
 
     /**
      * Creates a <code>NoiseBackend</code> using <code>org.terasology.utilities.procedulal.SimplexNoise</code>
@@ -47,6 +48,14 @@ public class NoiseSet implements Noise{
      * @param backends The backends with which to initialize this NoiseSet
      */
     public NoiseSet(NoiseBackend... backends){
+        float totalMultiplier = 0f;
+
+        for(NoiseBackend backend : backends){
+            totalMultiplier += backend.getMultiplier();
+        }
+
+        multiplier = 1/totalMultiplier;
+
         this.backends = backends;
     }
 
@@ -84,7 +93,7 @@ public class NoiseSet implements Noise{
             total += noiseCaller.process(backend.getNoise()) * backend.getMultiplier();
         }
 
-        return total;
+        return total*multiplier;
     }
 
     private interface NoiseCaller{
