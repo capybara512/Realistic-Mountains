@@ -27,13 +27,16 @@ import org.terasology.world.generation.Region;
 import org.terasology.world.generation.WorldRasterizer;
 import org.terasology.world.generation.facets.SurfaceHeightFacet;
 
-public class TerrainRasterizer implements WorldRasterizer{
-    private Block dirt, grass, trunk, leaf;
+public class SurfaceRasterizer implements WorldRasterizer{
+    public static int WATER_HEIGHT = 0, SAND_HEIGHT = 3;
+    private Block dirt, grass, water, sand;
 
     @Override
     public void initialize(){
         dirt = CoreRegistry.get(BlockManager.class).getBlock("Core:Dirt");
         grass = CoreRegistry.get(BlockManager.class).getBlock("Core:Grass");
+        water = CoreRegistry.get(BlockManager.class).getBlock("Core:Water");
+        sand = CoreRegistry.get(BlockManager.class).getBlock("Core:Sand");
     }
 
     @Override
@@ -43,11 +46,19 @@ public class TerrainRasterizer implements WorldRasterizer{
         for(Vector3i location : chunkRegion.getRegion()){
             int height = Math.round(surfaceHeightFacet.getWorld(location.x, location.z));
 
-            if(chunk.getBlock(ChunkMath.calcBlockPos(location)).getURI().equals(BlockManager.AIR_ID)){
-                if(location.y < height){
-                    chunk.setBlock(ChunkMath.calcBlockPos(location), dirt);
-                }else if(location.y == height){
-                    chunk.setBlock(ChunkMath.calcBlockPos(location), grass);
+            if(location.y > height){
+                if(location.y < WATER_HEIGHT){
+                    chunk.setBlock(ChunkMath.calcBlockPos(location), water);
+                }
+            }else{
+                if(height < SAND_HEIGHT){
+                    chunk.setBlock(ChunkMath.calcBlockPos(location), sand);
+                }else{
+                    if(location.y == height){
+                        chunk.setBlock(ChunkMath.calcBlockPos(location), grass);
+                    }else{
+                        chunk.setBlock(ChunkMath.calcBlockPos(location), dirt);
+                    }
                 }
             }
         }

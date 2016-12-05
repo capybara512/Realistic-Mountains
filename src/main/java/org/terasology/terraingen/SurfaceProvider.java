@@ -33,7 +33,11 @@ public class SurfaceProvider implements FacetProvider{
     public void setSeed(long seed){
         FastRandom random = new FastRandom(seed); //using a random for each octave's seed to ensure that they are completely different -- provides slightly better results at a negligible performance impact of a new FastRandom object
 
-        heightMap = new NoiseSet(
+        heightMap = createFractalGradientMap(random);
+    }
+
+    private NoiseSet createFractalGradientMap(FastRandom random){
+        return new NoiseSet(
                 NoiseSet.createSimplexOctaveBackend(random.nextLong(), 0.0008f, 128f),
                 NoiseSet.createSimplexOctaveBackend(random.nextLong(), 0.0016f, 64f),
                 NoiseSet.createSimplexOctaveBackend(random.nextLong(), 0.0032f, 32f),
@@ -51,12 +55,32 @@ public class SurfaceProvider implements FacetProvider{
 
         Rect2i processRegion = surfaceHeightFacet.getWorldRegion();
         for(BaseVector2i position : processRegion.contents()){
+            float value = heightMap.noise(position.x(), position.y());
+
             surfaceHeightFacet.setWorld(position,
-                    Math.round(heightMap.noise(position.x(), position.y())) //rounding to allow == height grass to work in TerrainRasterizer
+                    Math.round( //rounding to allow == height grass to work in SurfaceRasterizer
+                            value *
+                            scaleClimateMap(value * 256f) *
+                            256f
+                    )
             );
         }
 
         region.setRegionFacet(SurfaceHeightFacet.class, surfaceHeightFacet);
+    }
+
+    private float scaleClimateMap(float climateInput){
+        if(climateInput > 0f && climateInput < 16f){
+            return 0.01171875f; //make sure exactly 3 blocks are present where there normally would be 16
+        }else if(climateInput > 16f){
+            return max((climateInput - 16f) / 32f, 1f);
+        }else{
+            return 1f;
+        }
+    }
+
+    private float max(float n, float m){
+        return n < m ? n : m;
     }
 
 }

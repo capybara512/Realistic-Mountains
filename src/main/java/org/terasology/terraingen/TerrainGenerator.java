@@ -41,7 +41,7 @@ public class TerrainGenerator extends BaseFacetedWorldGenerator{
                 .addProvider(new SurfaceProvider())
                 .addProvider(new SeaLevelProvider(0))
                 .addProvider(new TreeProvider())
-                .addRasterizer(new TerrainRasterizer())
+                .addRasterizer(new SurfaceRasterizer())
                 .addRasterizer(new TreeRasterizer())
             ;
     }

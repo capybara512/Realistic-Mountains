@@ -16,6 +16,7 @@
 package org.terasology.terraingen.trees;
 
 import org.terasology.math.geom.BaseVector2i;
+import org.terasology.terraingen.SurfaceRasterizer;
 import org.terasology.utilities.procedural.Noise;
 import org.terasology.utilities.procedural.SimplexNoise;
 import org.terasology.world.generation.*;
@@ -39,7 +40,7 @@ public class TreeProvider implements FacetProvider{
 
         for(BaseVector2i position : surfaceHeightFacet.getWorldRegion().contents()){
             int height = Math.round(surfaceHeightFacet.getWorld(position));
-            if(treeFacet.getWorldRegion().encompasses(position.x(), height, position.y()) && noise.noise(position.x(), position.y()) > 0.99){
+            if(height > SurfaceRasterizer.WATER_HEIGHT && treeFacet.getWorldRegion().encompasses(position.x(), height, position.y()) && noise.noise(position.x(), position.y()) > 0.99){
                 treeFacet.setWorld(position.x(), height, position.y(), true);
             }
         }
